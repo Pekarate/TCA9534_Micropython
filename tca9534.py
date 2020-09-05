@@ -83,6 +83,13 @@ class TCA9534:
         self.bus.write_byte_data(self.address, self.REGISTER_OUTPUT_PORT, current_outputs)
         print("updated current_outputs: ", format(self.bus.read_byte_data(self.address, self.REGISTER_OUTPUT_PORT), '#010b'))
 
+    def write_pin(self, wbit, value):
+        """More Arduino-like format for writing a 1 or 0 to a pin."""
+        if value:
+            self.set_pin(wbit)
+        else:
+            self.clear_pin(wbit)
+
     def read_pin(self, wbit):
         """Read one of the pins as INPUT."""
         print("read pin: ", wbit)
