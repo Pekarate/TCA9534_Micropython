@@ -1,21 +1,11 @@
 import tca9534
 import time
 
-dev = tca9534.TCA9534()
+dev = tca9534.TCA9534(output=True)
 
 while True:
-    i = 0
-    while i < 8:
+    for i in range(8):
         dev.set_pin(i)
-        i += 1
-        time.sleep(0.5)
-    i = 0
-    while i < 8:
-        dev.clear_pin(i)
-        i += 1
-        time.sleep(0.5)
-    i = 0
-    while i < 8:
-        dev.read_pin(i)
-        i += 1
         time.sleep(1)
+        dev.clear_pin(i)
+    time.sleep(5)

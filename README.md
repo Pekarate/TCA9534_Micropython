@@ -8,4 +8,4 @@ Use `set_pin(pin)` to write `pin` HIGH
 
 Use `clear_pin(pin)` to write `pin` LOW
 
-`read_pin(pin)`
+Use `read_pin(pin)` as you would expect
