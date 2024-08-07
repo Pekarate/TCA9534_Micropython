@@ -10,4 +10,4 @@ Use `clear_pin(pin)` to write `pin` LOW
 Use `read_pin(pin)` as you would expect
 
 output example :
-![Screenshot 2024-08-07 231954](https://github.com/user-attachments/assets/5615a829-3dca-4a05-98fb-f6e4c4dc6d7a)
+![Screenshot 2024-08-08 001252](https://github.com/user-attachments/assets/046c80dc-03a7-4a54-9d6e-222f1fa401d5)

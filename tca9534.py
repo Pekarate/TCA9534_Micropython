@@ -7,7 +7,7 @@ https://www.ti.com/lit/ds/symlink/tca9534.pdf
 QWIIC GPIO board:
 https://github.com/sparkfunX/Qwiic_GPIO
 
-by aka.farm 09/2020
+by hoang4.tran 08/08/2024
 """
 from machine import Pin, I2C
 
@@ -31,12 +31,12 @@ class TCA9534:
         if output:
             # set all 8 channels to OUTPUT by writing 0
             print("...for write")
-            self.bus.writeto_mem(self.address, self.REGISTER_CONFIGURATION, b'0b00000000')
-            self.bus.writeto_mem(self.address, self.REGISTER_OUTPUT_PORT, b'0b00000000')
+            self.bus.writeto_mem(self.address, self.REGISTER_CONFIGURATION, bytes([0x00]))
+            self.bus.writeto_mem(self.address, self.REGISTER_OUTPUT_PORT, bytes([0x00]))
         else:
             # set all 8 channels to INPUT by writing 1
             print("...for read")
-            self.bus.writeto_mem(self.address, self.REGISTER_CONFIGURATION, b'0b11111111')
+            self.bus.writeto_mem(self.address, self.REGISTER_CONFIGURATION, bytes([0xFF]))
 
     def show_all_registers(self):
         """Read all registers."""
