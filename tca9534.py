@@ -26,18 +26,13 @@ class TCA9534:
         if bitmask:
             bitmasks = bitmask.to_bytes(1, 'big')
             self.bus.writeto_mem(self.address, self.REGISTER_CONFIGURATION, bitmasks)
-            current_config = self.bus.readfrom_mem(self.address, self.REGISTER_CONFIGURATION,1)
-            print(f"set bitmask:  {current_config[0]:08b}")
             return
-        print("no bitmask, setting up all channels")
         if output:
             # set all 8 channels to OUTPUT by writing 0
-            print("...for write")
             self.bus.writeto_mem(self.address, self.REGISTER_CONFIGURATION, bytes([0x00]))
             self.bus.writeto_mem(self.address, self.REGISTER_OUTPUT_PORT, bytes([0x00]))
         else:
             # set all 8 channels to INPUT by writing 1
-            print("...for read")
             self.bus.writeto_mem(self.address, self.REGISTER_CONFIGURATION, bytes([0xFF]))
 
     def show_all_registers(self):
@@ -45,53 +40,42 @@ class TCA9534:
         current_config = self.bus.readfrom_mem(self.address, self.REGISTER_CONFIGURATION,1)
         output_register = self.bus.readfrom_mem(self.address, self.REGISTER_OUTPUT_PORT,1)
         input_register = self.bus.readfrom_mem(self.address, self.REGISTER_INPUT_PORT,1)
-        print(f"configuration register: {current_config[0]:08b}")
-        print(f"output register: {output_register[0]:08b}")
-        print(f"input register: {input_register[0]:08b}")
-        return
+        return current_config, output_register, input_register
 
     def set_pin(self, wbit):
         """Set one of the output pins HIGH."""
-        print("set pin: ", wbit)
+        #print("set pin: ", wbit)
         # print("bitwise, the pin is", format((1 << wbit), '#010b'))
         # check that the channel is set to OUTPUT
         current_config = self.bus.readfrom_mem(self.address, self.REGISTER_CONFIGURATION,1)
         if(current_config[0] & (1 << wbit)):
             # bit is set, channel is in INPUT mode
-            new_config = current_config[0] | (1 << wbit)
-            print(f"need to set this channel to OUTPUT, new config:  {new_config:08b}")
+            new_config = current_config[0] & ~(1 << wbit)
             # write new config to TCA95344
             new_configs = new_config.to_bytes(1, 'big')
             self.bus.writeto_mem(self.address, self.REGISTER_CONFIGURATION, new_configs)
         current_outputs = self.bus.readfrom_mem(self.address, self.REGISTER_OUTPUT_PORT,1)
-        print(f"current_outputs: {current_outputs[0]:08b}")
         current_outputs = current_outputs[0] | (1 << wbit)
         updated_outputs = current_outputs.to_bytes(1, 'big')
         self.bus.writeto_mem(self.address, self.REGISTER_OUTPUT_PORT, updated_outputs)
-        current_outputs = self.bus.readfrom_mem(self.address, self.REGISTER_OUTPUT_PORT,1)
-        print(f"updated current_outputs: {current_outputs[0]:08b}")
 
     def clear_pin(self, wbit):
         """Set one of the output pins LOW."""
-        print("clear pin: ", wbit)
+        #print("clear pin: ", wbit)
         # print("bitwise, the pin is", format((1 << wbit), '#010b'))
         # check that the channel is set to OUTPUT
         current_config = self.bus.readfrom_mem(self.address, self.REGISTER_CONFIGURATION,1)
         if(current_config[0] & (1 << wbit)):
             # bit is set, channel is in INPUT mode
             new_config = current_config[0] | (1 << wbit)
-            print(f"need to set this channel to OUTPUT, new config:  {new_config:08b}")
             # write new config to TCA95344
-            #self.bus.writeto_mem(self.address, self.REGISTER_CONFIGURATION, new_config)
             new_configs = new_config.to_bytes(1, 'big')
             self.bus.writeto_mem(self.address, self.REGISTER_CONFIGURATION, new_configs)
         current_outputs = self.bus.readfrom_mem(self.address, self.REGISTER_OUTPUT_PORT,1)
-        print(f"current_outputs: {current_outputs[0]:08b}")
+        #print(f"current_outputs: {current_outputs[0]:08b}")
         current_outputs = current_outputs[0] & ~(1 << wbit)
         updated_outputs = current_outputs.to_bytes(1, 'big')
         self.bus.writeto_mem(self.address, self.REGISTER_OUTPUT_PORT, updated_outputs)
-        current_outputs = self.bus.readfrom_mem(self.address, self.REGISTER_OUTPUT_PORT,1)
-        print(f"updated current_outputs: {current_outputs[0]:08b}")
 
     def write_pin(self, wbit, value):
         """More Arduino-like format for writing a 1 or 0 to a pin."""
@@ -102,7 +86,7 @@ class TCA9534:
 
     def read_pin(self, wbit):
         """Read one of the pins as INPUT."""
-        print("read pin: ", wbit)
+        #print("read pin: ", wbit)
         # print("bitwise, the pin is", format((1 << wbit), '#010b'))
         # check that the channel is set to INPUT
         current_config = self.bus.readfrom_mem(self.address, self.REGISTER_CONFIGURATION,1)
@@ -112,11 +96,12 @@ class TCA9534:
         else:
             # bit is clear, channel is in OUTPUT mode
             new_config = current_config[0] | (1 << wbit)
-            print(f"new config: {new_config:08b}")
+            #print(f"new config: {new_config:08b}")
             # write new config to TCA95344
             new_configs = new_config.to_bytes(1, 'big')
             self.bus.writeto_mem(self.address, self.REGISTER_CONFIGURATION, new_configs)
         current_inputs = self.bus.readfrom_mem(self.address, self.REGISTER_INPUT_PORT,1)
-        print(f"current_inputs: {current_inputs[0]:08b}")
+        #print(f"current_inputs: {current_inputs[0]:08b}")
         isset = current_inputs[0] & (1 << wbit)
-        print(f"isset: {isset:08b}")
+        return isset
+        #print(f"isset: {isset:08b}")
