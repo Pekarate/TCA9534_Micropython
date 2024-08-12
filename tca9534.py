@@ -24,8 +24,10 @@ class TCA9534:
         self.address = tca9534_address
         self.bus = I2C(i2c_ch,scl=scl, sda=sda, freq=freq)
         if bitmask:
-            self.bus.writeto_mem(self.address, self.REGISTER_CONFIGURATION, bitmask)
-            print("set bitmask: ", format(self.bus.readfrom_mem(self.address, self.REGISTER_CONFIGURATION)))
+            bitmasks = bitmask.to_bytes(1, 'big')
+            self.bus.writeto_mem(self.address, self.REGISTER_CONFIGURATION, bitmasks)
+            current_config = self.bus.readfrom_mem(self.address, self.REGISTER_CONFIGURATION,1)
+            print(f"set bitmask:  {current_config[0]:08b}")
             return
         print("no bitmask, setting up all channels")
         if output:
@@ -40,10 +42,10 @@ class TCA9534:
 
     def show_all_registers(self):
         """Read all registers."""
-        current_config = self.bus.readfrom_mem(self.address, self.REGISTER_CONFIGURATION)
-        output_register = self.bus.readfrom_mem(self.address, self.REGISTER_OUTPUT_PORT)
-        input_register = self.bus.readfrom_mem(self.address, self.REGISTER_INPUT_PORT)
-        print(f"configuration register: {current_outputs[0]:08b}")
+        current_config = self.bus.readfrom_mem(self.address, self.REGISTER_CONFIGURATION,1)
+        output_register = self.bus.readfrom_mem(self.address, self.REGISTER_OUTPUT_PORT,1)
+        input_register = self.bus.readfrom_mem(self.address, self.REGISTER_INPUT_PORT,1)
+        print(f"configuration register: {current_config[0]:08b}")
         print(f"output register: {output_register[0]:08b}")
         print(f"input register: {input_register[0]:08b}")
         return
